@@ -1,0 +1,238 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+}
+
+/* Sidebar */
+.app-layout__sidebar {
+  width: 240px;
+  background: #fff;
+  border-right: 1px solid var(--color-slate-200);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.app-layout__brand {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--color-slate-100);
+}
+
+.app-layout__brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--color-blue-900);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-layout__brand-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-slate-800);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.app-layout__brand-subtitle {
+  font-size: 11px;
+  color: var(--color-slate-500);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.app-layout__nav {
+  flex: 1;
+  padding: 16px 12px;
+}
+
+.app-layout__nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-slate-600);
+  transition: background-color 0.15s ease;
+}
+
+.app-layout__nav-link:hover {
+  background: var(--color-slate-100);
+}
+
+.app-layout__nav-link--active,
+.app-layout__nav-link--active:hover {
+  background: var(--color-blue-900);
+  color: #fff;
+}
+
+.app-layout__sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid var(--color-slate-100);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-layout__sidebar-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--color-slate-600);
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+
+.app-layout__sidebar-btn:hover {
+  background: var(--color-slate-100);
+}
+
+/* Contenido principal */
+.app-layout__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-layout__header {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid var(--color-slate-200);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.app-layout__search {
+  position: relative;
+  width: 320px;
+  max-width: 100%;
+}
+
+.app-layout__search-icon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding-left: 12px;
+  display: flex;
+  align-items: center;
+  color: var(--color-slate-400);
+}
+
+.app-layout__search-input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  background: var(--color-slate-50);
+  border: 1px solid var(--color-slate-200);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.app-layout__search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-blue-900);
+}
+
+.app-layout__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-layout__icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-slate-400);
+}
+
+.app-layout__icon-btn:hover {
+  color: var(--color-slate-600);
+}
+
+.app-layout__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-layout__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-blue-100);
+  color: var(--color-blue-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.app-layout__user-info {
+  text-align: left;
+}
+
+.app-layout__user-name {
+  font-size: 14px;
+  color: var(--color-slate-700);
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.app-layout__user-role {
+  font-size: 12px;
+  color: var(--color-slate-400);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.app-layout__logout-link {
+  font-size: 14px;
+  color: var(--color-slate-600);
+  background: transparent;
+  border: none;
+  margin-left: 8px;
+}
+
+.app-layout__logout-link:hover {
+  color: var(--color-blue-900);
+}
+
+.app-layout__main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .app-layout__user-info {
+    display: none;
+  }
+}
