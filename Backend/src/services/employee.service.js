@@ -24,8 +24,19 @@ const updateEmployee = async (id, data) => {
     return await employeeRepository.update(id, data);
 };
 
+const updateEmployeeStatus = async (id, active) => {
+    const employee = await employeeRepository.getById(id);
+
+    if (!employee) {
+        throw new Error('Empleado no encontrado');
+    }
+
+    return await employeeRepository.updateStatus(id, active);
+};
+
 module.exports = {
     getEmployees,
     getEmployeeById,
-    updateEmployee
+    updateEmployee,
+    updateEmployeeStatus
 };
