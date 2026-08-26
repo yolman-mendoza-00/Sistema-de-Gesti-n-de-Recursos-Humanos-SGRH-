@@ -61,3 +61,43 @@ export function updateEmployee(id, data) {
     }),
   });
 }
+
+// --- Employee Department History ---
+// Registro de qué departamento y turno tiene (o tuvo) cada empleado.
+// Campos: employeeId, employeeName, departmentId, departmentName, shiftId, startDate, endDate
+// Una asignación con endDate = null es la ACTUAL.
+
+// Trae el historial completo de TODOS los empleados (para armar la columna
+// "Departamento" en el listado de Empleados).
+export function getAllDepartmentHistory() {
+  return request("/employee-department-history");
+}
+
+// Trae el historial completo de UN empleado (más reciente primero)
+export function getEmployeeDepartmentHistory(employeeId) {
+  return request(`/employee-department-history/${employeeId}`);
+}
+
+// Asigna por primera vez un departamento/turno a un empleado que no tiene ninguno
+export function assignDepartment(data) {
+  return request("/employee-department-history", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// Cambia de departamento: cierra la asignación actual y abre una nueva
+export function changeEmployeeDepartment(employeeId, data) {
+  return request(`/employee-department-history/${employeeId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+// Cierra la asignación actual sin abrir una nueva (el empleado queda sin departamento)
+export function finishDepartmentAssignment(employeeId, endDate) {
+  return request(`/employee-department-history/${employeeId}/finish`, {
+    method: "PATCH",
+    body: JSON.stringify({ endDate }),
+  });
+}

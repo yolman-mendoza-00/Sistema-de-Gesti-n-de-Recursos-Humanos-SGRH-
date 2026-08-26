@@ -1,21 +1,37 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import { getEmployees } from "../../api/api";
+import { getEmployees, getAllDepartmentHistory } from "../../api/api";
 import "./Employees.css";
 
 const PAGE_SIZE = 10;
 
 export default function Employees() {
   const [all, setAll] = useState([]);
+  const [departmentByEmployee, setDepartmentByEmployee] = useState({});
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getEmployees()
-      .then(setAll)
+    Promise.all([getEmployees(), getAllDepartmentHistory().catch(() => [])])
+      .then(([employees, history]) => {
+        setAll(employees);
+
+        // Nos quedamos solo con la asignación ACTUAL de cada empleado
+        // (la que tiene endDate = null). Si hay varias sin cerrar (no debería
+        // pasar, pero por si acaso) tomamos la de startDate más reciente.
+        const current = {};
+        for (const h of history) {
+          if (h.endDate) continue;
+          const existing = current[h.employeeId];
+          if (!existing || new Date(h.startDate) > new Date(existing.startDate)) {
+            current[h.employeeId] = h;
+          }
+        }
+        setDepartmentByEmployee(current);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -78,6 +94,7 @@ export default function Employees() {
                 <tr>
                   <th>Nombre</th>
                   <th>Cargo</th>
+                  <th>Departamento</th>
                   <th>Fecha de Contratación</th>
                   <th>Fecha de Nacimiento</th>
                   <th>Hrs. Vacaciones</th>
@@ -88,7 +105,7 @@ export default function Employees() {
               <tbody>
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="employees__empty">No se encontraron empleados.</td>
+                    <td colSpan={8} className="employees__empty">No se encontraron empleados.</td>
                   </tr>
                 )}
                 {paginated.map((e) => (
@@ -103,6 +120,7 @@ export default function Employees() {
                       </div>
                     </td>
                     <td>{e.jobTitle}</td>
+                    <td>{departmentByEmployee[e.id]?.departmentName ?? "Sin asignar"}</td>
                     <td>{e.hireDate ? new Date(e.hireDate).toLocaleDateString() : "—"}</td>
                     <td>{e.birthDate ? new Date(e.birthDate).toLocaleDateString() : "—"}</td>
                     <td>{e.vacationHours ?? "—"}</td>
