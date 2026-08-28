@@ -62,6 +62,18 @@ export function updateEmployee(id, data) {
   });
 }
 
+// Activa (true) o desactiva (false) un empleado (CurrentFlag en la BD).
+// OJO: el backend filtra CurrentFlag=1 en GET /employees y /employees/:id,
+// así que un empleado desactivado deja de poder consultarse — no hay forma
+// de reactivarlo desde la UI hasta que el backend deje de filtrar por eso
+// (o agregue un endpoint/parámetro para listar inactivos).
+export function updateEmployeeStatus(id, active) {
+  return request(`/employees/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ active }),
+  });
+}
+
 // --- Employee Department History ---
 // Registro de qué departamento y turno tiene (o tuvo) cada empleado.
 // Campos: employeeId, employeeName, departmentId, departmentName, shiftId, startDate, endDate

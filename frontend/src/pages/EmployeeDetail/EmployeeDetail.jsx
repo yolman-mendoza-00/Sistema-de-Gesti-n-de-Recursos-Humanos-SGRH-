@@ -4,6 +4,7 @@ import AppLayout from "../../components/AppLayout/AppLayout";
 import {
   getEmployeeById,
   updateEmployee,
+  updateEmployeeStatus,
   getEmployeeDepartmentHistory,
   assignDepartment,
   changeEmployeeDepartment,
@@ -95,6 +96,29 @@ export default function EmployeeDetail() {
     }
   }
 
+  const [deactivating, setDeactivating] = useState(false);
+  const [statusError, setStatusError] = useState("");
+
+  async function handleDeactivate() {
+    const confirmed = window.confirm(
+      `¿Seguro que quieres desactivar a ${employee.name}? Después de esto ya no va a aparecer en el listado ni se va a poder consultar su perfil.`
+    );
+    if (!confirmed) return;
+
+    setDeactivating(true);
+    setStatusError("");
+    try {
+      await updateEmployeeStatus(id, false);
+      // El empleado deja de ser consultable (CurrentFlag=0 lo filtra el
+      // backend), así que no tiene sentido quedarnos en esta página.
+      navigate("/empleados");
+    } catch (err) {
+      setStatusError(err.message);
+    } finally {
+      setDeactivating(false);
+    }
+  }
+
   async function handleSave() {
     setSaving(true);
     setError("");
@@ -150,9 +174,18 @@ export default function EmployeeDetail() {
             <p className="employee-detail__subtitle">ID: {employee.id}</p>
           </div>
           {!editing ? (
-            <button onClick={() => setEditing(true)} className="employee-detail__btn-primary">
-              Editar Perfil
-            </button>
+            <div className="employee-detail__actions">
+              <button
+                onClick={handleDeactivate}
+                disabled={deactivating}
+                className="employee-detail__btn-danger"
+              >
+                {deactivating ? "Desactivando..." : "Desactivar Empleado"}
+              </button>
+              <button onClick={() => setEditing(true)} className="employee-detail__btn-primary">
+                Editar Perfil
+              </button>
+            </div>
           ) : (
             <div className="employee-detail__actions">
               <button onClick={() => { setForm(employee); setEditing(false); }} className="employee-detail__btn-secondary">
@@ -174,6 +207,7 @@ export default function EmployeeDetail() {
         </div>
 
         {error && <p className="employee-detail__error">{error}</p>}
+        {statusError && <p className="employee-detail__error">{statusError}</p>}
 
         <div className="employee-detail__grid">
           <section className="employee-detail__section">
