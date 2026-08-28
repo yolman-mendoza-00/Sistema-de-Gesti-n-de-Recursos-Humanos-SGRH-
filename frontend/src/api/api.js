@@ -18,7 +18,6 @@ async function request(path, options = {}) {
 }
 
 // --- Auth ---
-// Ahora el backend devuelve también nombre, email y cargo (no solo el id)
 export function login(email, password) {
   return request("/auth/login", {
     method: "POST",
@@ -41,14 +40,13 @@ export function updateDepartment(id, data) {
 }
 
 // --- Employees ---
-// Campos actuales: id, name, nationalId, organizationLevel, jobTitle,
-// birthDate, hireDate, vacationHours, sickLeaveHours
 export function getEmployees() {
   return request("/employees");
 }
 export function getEmployeeById(id) {
   return request(`/employees/${id}`);
 }
+
 // El PATCH solo acepta estos 4 campos ahora
 export function updateEmployee(id, data) {
   return request(`/employees/${id}`, {
@@ -63,10 +61,7 @@ export function updateEmployee(id, data) {
 }
 
 // Activa (true) o desactiva (false) un empleado (CurrentFlag en la BD).
-// OJO: el backend filtra CurrentFlag=1 en GET /employees y /employees/:id,
-// así que un empleado desactivado deja de poder consultarse — no hay forma
-// de reactivarlo desde la UI hasta que el backend deje de filtrar por eso
-// (o agregue un endpoint/parámetro para listar inactivos).
+// Revisar el desactivar 
 export function updateEmployeeStatus(id, active) {
   return request(`/employees/${id}/status`, {
     method: "PATCH",
@@ -74,13 +69,7 @@ export function updateEmployeeStatus(id, active) {
   });
 }
 
-// --- Employee Department History ---
 // Registro de qué departamento y turno tiene (o tuvo) cada empleado.
-// Campos: employeeId, employeeName, departmentId, departmentName, shiftId, startDate, endDate
-// Una asignación con endDate = null es la ACTUAL.
-
-// Trae el historial completo de TODOS los empleados (para armar la columna
-// "Departamento" en el listado de Empleados).
 export function getAllDepartmentHistory() {
   return request("/employee-department-history");
 }

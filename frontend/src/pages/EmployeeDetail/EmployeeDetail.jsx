@@ -12,9 +12,6 @@ import {
 } from "../../api/api";
 import "./EmployeeDetail.css";
 
-// No existe un endpoint de Shifts en el backend todavía (solo existe la tabla
-// en la BD). Estos son los 3 turnos estándar de AdventureWorks — confirmar
-// los IDs reales con la base de datos o pedir que se construya el endpoint.
 const SHIFTS = [
   { id: 1, name: "Día (7:00 AM - 3:00 PM)" },
   { id: 2, name: "Tarde (3:00 PM - 11:00 PM)" },
@@ -61,8 +58,6 @@ export default function EmployeeDetail() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
 
-    // Si el empleado no tiene historial todavía, el backend responde 404 —
-    // lo tratamos como "sin departamento asignado", no como un error real.
     getEmployeeDepartmentHistory(id)
       .then(setHistory)
       .catch(() => setHistory([]));
