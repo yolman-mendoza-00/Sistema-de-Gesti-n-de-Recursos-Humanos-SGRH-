@@ -1,5 +1,5 @@
 .employee-detail {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 32px;
 }
@@ -15,44 +15,121 @@
 }
 
 .employee-detail__back {
-  font-size: 14px;
-  color: var(--color-blue-900);
-  font-weight: 500;
+  font-size: 18px;
+  color: var(--color-slate-600);
   background: none;
   border: none;
-  margin-bottom: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
 }
 
 .employee-detail__back:hover {
-  text-decoration: underline;
-}
-
-.employee-detail__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
+  color: var(--color-blue-900);
 }
 
 .employee-detail__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-slate-800);
+  margin: 0 0 4px;
+}
+
+.employee-detail__id-row {
+  font-size: 13px;
+  color: var(--color-slate-500);
+  margin: 0 0 20px;
+}
+
+.employee-detail__id-badge {
+  background: var(--color-slate-100);
+  color: var(--color-slate-600);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* Tarjeta de perfil */
+.employee-detail__profile-card {
+  background: #fff;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.employee-detail__profile-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.employee-detail__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: var(--color-blue-100);
+  color: var(--color-blue-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 20px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.employee-detail__name {
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-slate-800);
   margin: 0;
 }
 
-.employee-detail__subtitle {
+.employee-detail__job {
   font-size: 14px;
-  color: var(--color-slate-500);
-  margin: 0;
+  color: var(--color-blue-900);
+  margin: 2px 0 8px;
+}
+
+.employee-detail__badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.employee-detail__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-green-700);
+  background: var(--color-green-100);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.employee-detail__tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-green-700);
+}
+
+.employee-detail__error {
+  font-size: 14px;
+  color: var(--color-red-600);
+  margin: 0 0 16px;
 }
 
 .employee-detail__actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .employee-detail__btn-primary {
@@ -63,6 +140,7 @@
   padding: 8px 16px;
   border: none;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
 .employee-detail__btn-primary:hover:not(:disabled) {
@@ -86,58 +164,51 @@
   background: var(--color-slate-100);
 }
 
-.employee-detail__profile-card {
+.employee-detail__btn-danger {
   background: #fff;
-  border: 1px solid var(--color-slate-200);
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.employee-detail__avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: var(--color-blue-100);
-  color: var(--color-blue-900);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.employee-detail__name {
-  font-weight: 600;
-  color: var(--color-slate-800);
-  margin: 0;
-}
-
-.employee-detail__job {
-  font-size: 14px;
-  color: var(--color-slate-500);
-  margin: 0;
-}
-
-.employee-detail__error {
-  font-size: 14px;
   color: var(--color-red-600);
-  margin: 0 0 16px;
+  border: 1px solid var(--color-red-600);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
+.employee-detail__btn-danger:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.employee-detail__btn-danger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.employee-detail__btn-link {
+  background: none;
+  border: none;
+  color: var(--color-blue-900);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.employee-detail__btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Grid de 3 tarjetas */
 .employee-detail__grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .employee-detail__grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -149,11 +220,17 @@
 }
 
 .employee-detail__section-title {
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--color-slate-400);
-  text-transform: uppercase;
-  margin: 0 0 12px;
+  color: var(--color-slate-700);
+  margin: 0 0 16px;
+}
+
+.employee-detail__section-icon {
+  font-size: 14px;
 }
 
 .employee-detail__dl {
@@ -164,15 +241,25 @@
   margin: 0;
 }
 
-.employee-detail__dl dt {
-  color: var(--color-slate-400);
-  font-size: 12px;
-  margin: 0;
+.employee-detail__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.employee-detail__dl dd {
-  color: var(--color-slate-800);
+.employee-detail__row dt {
+  color: var(--color-slate-400);
+  font-size: 13px;
   margin: 0;
+  white-space: nowrap;
+}
+
+.employee-detail__row dd {
+  color: var(--color-slate-800);
+  font-weight: 500;
+  margin: 0;
+  text-align: right;
 }
 
 .employee-detail__input {
@@ -184,6 +271,7 @@
   margin-top: 4px;
 }
 
+/* Beneficios con barra de progreso */
 .employee-detail__benefits {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -197,15 +285,21 @@
 }
 
 .employee-detail__benefit-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-slate-400);
   margin: 0 0 4px;
 }
 
 .employee-detail__benefit-value {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.employee-detail__benefit-unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-slate-400);
 }
 
 .employee-detail__benefit-value--blue {
@@ -216,29 +310,34 @@
   color: var(--color-emerald-700);
 }
 
-.employee-detail__no-department {
-  font-size: 14px;
-  color: var(--color-slate-400);
-  margin: 0 0 12px;
+.employee-detail__bar {
+  height: 4px;
+  background: var(--color-slate-200);
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-.employee-detail__btn-department {
-  margin-top: 12px;
-  padding-left: 0;
-  padding-right: 0;
-  color: var(--color-blue-900);
-  font-weight: 500;
+.employee-detail__bar-fill {
+  height: 100%;
+  border-radius: 999px;
 }
 
-.employee-detail__btn-department:hover {
-  background: transparent;
-  text-decoration: underline;
+.employee-detail__bar-fill--blue {
+  background: var(--color-blue-900);
 }
 
+.employee-detail__bar-fill--green {
+  background: var(--color-emerald-700);
+}
+
+/* Formulario de departamento */
 .employee-detail__dept-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-slate-100);
 }
 
 .employee-detail__dept-form label {
@@ -258,7 +357,7 @@
 }
 
 .employee-detail__history {
-  margin-top: 16px;
+  margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--color-slate-100);
 }
@@ -273,23 +372,4 @@
   font-size: 13px;
   color: var(--color-slate-600);
   padding: 4px 0;
-}
-
-.employee-detail__btn-danger {
-  background: #fff;
-  color: var(--color-red-600);
-  border: 1px solid var(--color-red-600);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 6px;
-}
-
-.employee-detail__btn-danger:hover:not(:disabled) {
-  background: #fef2f2;
-}
-
-.employee-detail__btn-danger:disabled {
-  opacity: 0.6;
-  cursor: default;
 }

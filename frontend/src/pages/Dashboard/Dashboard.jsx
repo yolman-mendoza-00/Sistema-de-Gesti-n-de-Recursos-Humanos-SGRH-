@@ -46,6 +46,36 @@ export default function Dashboard() {
               Ver Directorio →
             </Link>
           </div>
+
+          <div className="dashboard__card">
+            <div className="dashboard__card-icon dashboard__card-icon--blue">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="dashboard__card-title">Turnos</h2>
+            <p className="dashboard__card-text">
+              Consulta y administra los horarios de trabajo disponibles en la empresa.
+            </p>
+            <Link to="/turnos" className="dashboard__card-btn">
+              Gestionar Turnos →
+            </Link>
+          </div>
+
+          <div className="dashboard__card">
+            <div className="dashboard__card-icon dashboard__card-icon--green">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7zM6 9V7m0 2a2 2 0 100-4 2 2 0 000 4z" />
+              </svg>
+            </div>
+            <h2 className="dashboard__card-title">Candidatos</h2>
+            <p className="dashboard__card-text">
+              Revisa a las personas que han aplicado a un puesto en la empresa.
+            </p>
+            <Link to="/candidatos" className="dashboard__card-btn">
+              Ver Candidatos →
+            </Link>
+          </div>
         </div>
       </div>
     </AppLayout>

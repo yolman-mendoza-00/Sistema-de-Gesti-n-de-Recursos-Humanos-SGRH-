@@ -9,18 +9,19 @@ import {
   assignDepartment,
   changeEmployeeDepartment,
   getDepartments,
+  getShifts,
 } from "../../api/api";
 import "./EmployeeDetail.css";
-
-const SHIFTS = [
-  { id: 1, name: "Día (7:00 AM - 3:00 PM)" },
-  { id: 2, name: "Tarde (3:00 PM - 11:00 PM)" },
-  { id: 3, name: "Noche (11:00 PM - 7:00 AM)" },
-];
 
 function toDateInputValue(dateStr) {
   if (!dateStr) return "";
   return new Date(dateStr).toISOString().split("T")[0];
+}
+
+function initials(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(" ");
+  return (parts[0]?.[0] || "") + (parts[1]?.[0] || "");
 }
 
 export default function EmployeeDetail() {
@@ -37,6 +38,7 @@ export default function EmployeeDetail() {
   // --- Departamento actual ---
   const [history, setHistory] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [shifts, setShifts] = useState([]);
   const [assigningDept, setAssigningDept] = useState(false);
   const [savingDept, setSavingDept] = useState(false);
   const [deptError, setDeptError] = useState("");
@@ -48,6 +50,10 @@ export default function EmployeeDetail() {
 
   const currentAssignment = history.find((h) => !h.endDate) || null;
   const pastAssignments = history.filter((h) => h.endDate);
+
+  // --- Desactivar empleado ---
+  const [deactivating, setDeactivating] = useState(false);
+  const [statusError, setStatusError] = useState("");
 
   useEffect(() => {
     getEmployeeById(id)
@@ -63,7 +69,13 @@ export default function EmployeeDetail() {
       .catch(() => setHistory([]));
 
     getDepartments().then(setDepartments).catch(() => {});
+    getShifts().then(setShifts).catch(() => {});
   }, [id]);
+
+  function shiftName(shiftId) {
+    const s = shifts.find((s) => s.shiftId === shiftId);
+    return s ? s.name : `Turno ${shiftId}`;
+  }
 
   async function handleSaveDepartment() {
     setSavingDept(true);
@@ -91,9 +103,6 @@ export default function EmployeeDetail() {
     }
   }
 
-  const [deactivating, setDeactivating] = useState(false);
-  const [statusError, setStatusError] = useState("");
-
   async function handleDeactivate() {
     const confirmed = window.confirm(
       `¿Seguro que quieres desactivar a ${employee.name}? Después de esto ya no va a aparecer en el listado ni se va a poder consultar su perfil.`
@@ -104,8 +113,6 @@ export default function EmployeeDetail() {
     setStatusError("");
     try {
       await updateEmployeeStatus(id, false);
-      // El empleado deja de ser consultable (CurrentFlag=0 lo filtra el
-      // backend), así que no tiene sentido quedarnos en esta página.
       navigate("/empleados");
     } catch (err) {
       setStatusError(err.message);
@@ -134,12 +141,6 @@ export default function EmployeeDetail() {
     }
   }
 
-  function initials(name) {
-    if (!name) return "?";
-    const parts = name.trim().split(" ");
-    return (parts[0]?.[0] || "") + (parts[1]?.[0] || "");
-  }
-
   if (loading) {
     return (
       <AppLayout>
@@ -156,18 +157,39 @@ export default function EmployeeDetail() {
     );
   }
 
+  // Vacaciones e incapacidad como % de una barra, tope visual en 160h (~4 semanas)
+  const vacationPct = Math.min(100, ((employee.vacationHours || 0) / 160) * 100);
+  const sickPct = Math.min(100, ((employee.sickLeaveHours || 0) / 160) * 100);
+
   return (
-    <AppLayout>
+    <AppLayout searchPlaceholder="Buscar empleados...">
       <div className="employee-detail">
         <button onClick={() => navigate("/empleados")} className="employee-detail__back">
-          ← Volver al Listado
+          ← 
         </button>
+        <h1 className="employee-detail__title">Perfil del Empleado</h1>
+        <p className="employee-detail__id-row">
+          ID: <span className="employee-detail__id-badge">EMP-{String(employee.id).padStart(4, "0")}</span>
+        </p>
 
-        <div className="employee-detail__header">
-          <div>
-            <h1 className="employee-detail__title">Perfil del Empleado</h1>
-            <p className="employee-detail__subtitle">ID: {employee.id}</p>
+        {/* Tarjeta de perfil */}
+        <div className="employee-detail__profile-card">
+          <div className="employee-detail__profile-left">
+            <div className="employee-detail__avatar">{initials(employee.name)}</div>
+            <div>
+              <p className="employee-detail__name">{employee.name}</p>
+              <p className="employee-detail__job">{employee.jobTitle}</p>
+              <div className="employee-detail__badges">
+                {currentAssignment && (
+                  <span className="employee-detail__tag">
+                    <span className="employee-detail__tag-dot" />
+                    {currentAssignment.departmentName}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
+
           {!editing ? (
             <div className="employee-detail__actions">
               <button
@@ -175,10 +197,10 @@ export default function EmployeeDetail() {
                 disabled={deactivating}
                 className="employee-detail__btn-danger"
               >
-                {deactivating ? "Desactivando..." : "Desactivar Empleado"}
+                {deactivating ? "Desactivando..." : "Desactivar"}
               </button>
               <button onClick={() => setEditing(true)} className="employee-detail__btn-primary">
-                Editar Perfil
+                ✎ Editar Perfil
               </button>
             </div>
           ) : (
@@ -193,30 +215,25 @@ export default function EmployeeDetail() {
           )}
         </div>
 
-        <div className="employee-detail__profile-card">
-          <div className="employee-detail__avatar">{initials(employee.name)}</div>
-          <div>
-            <p className="employee-detail__name">{employee.name}</p>
-            <p className="employee-detail__job">{employee.jobTitle}</p>
-          </div>
-        </div>
-
         {error && <p className="employee-detail__error">{error}</p>}
         {statusError && <p className="employee-detail__error">{statusError}</p>}
 
+        {/* 3 tarjetas */}
         <div className="employee-detail__grid">
           <section className="employee-detail__section">
-            <h3 className="employee-detail__section-title">Datos Básicos</h3>
+            <h3 className="employee-detail__section-title">
+              <span className="employee-detail__section-icon">👤</span> Datos Básicos
+            </h3>
             <dl className="employee-detail__dl">
-              <div>
+              <div className="employee-detail__row">
                 <dt>ID Nacional</dt>
                 <dd>{employee.nationalId}</dd>
               </div>
-              <div>
+              <div className="employee-detail__row">
                 <dt>Fecha de Nacimiento</dt>
                 <dd>{employee.birthDate ? new Date(employee.birthDate).toLocaleDateString() : "—"}</dd>
               </div>
-              <div>
+              <div className="employee-detail__row">
                 <dt>Nivel Organizacional</dt>
                 <dd>{employee.organizationLevel ?? "—"}</dd>
               </div>
@@ -224,115 +241,11 @@ export default function EmployeeDetail() {
           </section>
 
           <section className="employee-detail__section">
-            <h3 className="employee-detail__section-title">Departamento Actual</h3>
-
-            {!assigningDept ? (
-              <>
-                {currentAssignment ? (
-                  <dl className="employee-detail__dl">
-                    <div>
-                      <dt>Departamento</dt>
-                      <dd>{currentAssignment.departmentName}</dd>
-                    </div>
-                    <div>
-                      <dt>Turno</dt>
-                      <dd>{SHIFTS.find((s) => s.id === currentAssignment.shiftId)?.name ?? `ID ${currentAssignment.shiftId}`}</dd>
-                    </div>
-                    <div>
-                      <dt>Desde</dt>
-                      <dd>{new Date(currentAssignment.startDate).toLocaleDateString()}</dd>
-                    </div>
-                  </dl>
-                ) : (
-                  <p className="employee-detail__no-department">Sin departamento asignado.</p>
-                )}
-
-                <button
-                  onClick={() => {
-                    setDeptError("");
-                    setDeptForm({
-                      departmentId: currentAssignment?.departmentId ?? "",
-                      shiftId: currentAssignment?.shiftId ?? "",
-                      startDate: new Date().toISOString().split("T")[0],
-                    });
-                    setAssigningDept(true);
-                  }}
-                  className="employee-detail__btn-secondary employee-detail__btn-department"
-                >
-                  {currentAssignment ? "Cambiar Departamento" : "Asignar Departamento"}
-                </button>
-              </>
-            ) : (
-              <div className="employee-detail__dept-form">
-                <div>
-                  <label>Departamento</label>
-                  <select
-                    value={deptForm.departmentId}
-                    onChange={(e) => setDeptForm({ ...deptForm, departmentId: e.target.value })}
-                    className="employee-detail__input"
-                  >
-                    <option value="">Selecciona...</option>
-                    {departments.map((d) => (
-                      <option key={d.DepartmentID} value={d.DepartmentID}>{d.Name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label>Turno</label>
-                  <select
-                    value={deptForm.shiftId}
-                    onChange={(e) => setDeptForm({ ...deptForm, shiftId: e.target.value })}
-                    className="employee-detail__input"
-                  >
-                    <option value="">Selecciona...</option>
-                    {SHIFTS.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label>Fecha de inicio</label>
-                  <input
-                    type="date"
-                    value={deptForm.startDate}
-                    onChange={(e) => setDeptForm({ ...deptForm, startDate: e.target.value })}
-                    className="employee-detail__input"
-                  />
-                </div>
-
-                {deptError && <p className="employee-detail__error">{deptError}</p>}
-
-                <div className="employee-detail__actions">
-                  <button onClick={() => setAssigningDept(false)} className="employee-detail__btn-secondary">
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleSaveDepartment}
-                    disabled={savingDept || !deptForm.departmentId || !deptForm.shiftId || !deptForm.startDate}
-                    className="employee-detail__btn-primary"
-                  >
-                    {savingDept ? "Guardando..." : "Guardar"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {pastAssignments.length > 0 && (
-              <div className="employee-detail__history">
-                <p className="employee-detail__history-title">Historial anterior</p>
-                {pastAssignments.map((h, i) => (
-                  <div key={i} className="employee-detail__history-item">
-                    {h.departmentName} — {new Date(h.startDate).toLocaleDateString()} a {new Date(h.endDate).toLocaleDateString()}
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="employee-detail__section">
-            <h3 className="employee-detail__section-title">Información Laboral</h3>
+            <h3 className="employee-detail__section-title">
+              <span className="employee-detail__section-icon">📁</span> Información Laboral
+            </h3>
             <dl className="employee-detail__dl">
-              <div>
+              <div className="employee-detail__row">
                 <dt>Cargo</dt>
                 {editing ? (
                   <input
@@ -344,7 +257,7 @@ export default function EmployeeDetail() {
                   <dd>{employee.jobTitle}</dd>
                 )}
               </div>
-              <div>
+              <div className="employee-detail__row">
                 <dt>Fecha de Contratación</dt>
                 {editing ? (
                   <input
@@ -357,14 +270,105 @@ export default function EmployeeDetail() {
                   <dd>{employee.hireDate ? new Date(employee.hireDate).toLocaleDateString() : "—"}</dd>
                 )}
               </div>
+              <div className="employee-detail__row">
+                <dt>Departamento</dt>
+                <dd>{currentAssignment ? currentAssignment.departmentName : "Sin asignar"}</dd>
+              </div>
+              <div className="employee-detail__row">
+                <dt>Turno</dt>
+                <dd>{currentAssignment ? shiftName(currentAssignment.shiftId) : "—"}</dd>
+              </div>
+
+              {!assigningDept ? (
+                <button
+                  onClick={() => {
+                    setDeptError("");
+                    setDeptForm({
+                      departmentId: currentAssignment?.departmentId ?? "",
+                      shiftId: currentAssignment?.shiftId ?? "",
+                      startDate: new Date().toISOString().split("T")[0],
+                    });
+                    setAssigningDept(true);
+                  }}
+                  className="employee-detail__btn-link"
+                >
+                  {currentAssignment ? "Cambiar Departamento" : "Asignar Departamento"}
+                </button>
+              ) : (
+                <div className="employee-detail__dept-form">
+                  <div>
+                    <label>Departamento</label>
+                    <select
+                      value={deptForm.departmentId}
+                      onChange={(e) => setDeptForm({ ...deptForm, departmentId: e.target.value })}
+                      className="employee-detail__input"
+                    >
+                      <option value="">Selecciona...</option>
+                      {departments.map((d) => (
+                        <option key={d.DepartmentID} value={d.DepartmentID}>{d.Name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label>Turno</label>
+                    <select
+                      value={deptForm.shiftId}
+                      onChange={(e) => setDeptForm({ ...deptForm, shiftId: e.target.value })}
+                      className="employee-detail__input"
+                    >
+                      <option value="">Selecciona...</option>
+                      {shifts.map((s) => (
+                        <option key={s.shiftId} value={s.shiftId}>{s.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label>Fecha de inicio</label>
+                    <input
+                      type="date"
+                      value={deptForm.startDate}
+                      onChange={(e) => setDeptForm({ ...deptForm, startDate: e.target.value })}
+                      className="employee-detail__input"
+                    />
+                  </div>
+
+                  {deptError && <p className="employee-detail__error">{deptError}</p>}
+
+                  <div className="employee-detail__actions">
+                    <button onClick={() => setAssigningDept(false)} className="employee-detail__btn-secondary">
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleSaveDepartment}
+                      disabled={savingDept || !deptForm.departmentId || !deptForm.shiftId || !deptForm.startDate}
+                      className="employee-detail__btn-primary"
+                    >
+                      {savingDept ? "Guardando..." : "Guardar"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {pastAssignments.length > 0 && (
+                <div className="employee-detail__history">
+                  <p className="employee-detail__history-title">Historial anterior</p>
+                  {pastAssignments.map((h, i) => (
+                    <div key={i} className="employee-detail__history-item">
+                      {h.departmentName} — {new Date(h.startDate).toLocaleDateString()} a {new Date(h.endDate).toLocaleDateString()}
+                    </div>
+                  ))}
+                </div>
+              )}
             </dl>
           </section>
 
           <section className="employee-detail__section">
-            <h3 className="employee-detail__section-title">Beneficios y Tiempo</h3>
+            <h3 className="employee-detail__section-title">
+              <span className="employee-detail__section-icon">⏱</span> Beneficios y Tiempo
+            </h3>
             <div className="employee-detail__benefits">
               <div className="employee-detail__benefit-box">
-                <p className="employee-detail__benefit-label">Hrs. Vacaciones</p>
+                <p className="employee-detail__benefit-label">Horas Vacaciones</p>
                 {editing ? (
                   <input
                     type="number"
@@ -373,13 +377,18 @@ export default function EmployeeDetail() {
                     className="employee-detail__input"
                   />
                 ) : (
-                  <p className="employee-detail__benefit-value employee-detail__benefit-value--blue">
-                    {employee.vacationHours} hrs
-                  </p>
+                  <>
+                    <p className="employee-detail__benefit-value employee-detail__benefit-value--blue">
+                      {employee.vacationHours}<span className="employee-detail__benefit-unit"> hrs</span>
+                    </p>
+                    <div className="employee-detail__bar">
+                      <div className="employee-detail__bar-fill employee-detail__bar-fill--blue" style={{ width: `${vacationPct}%` }} />
+                    </div>
+                  </>
                 )}
               </div>
               <div className="employee-detail__benefit-box">
-                <p className="employee-detail__benefit-label">Hrs. Incapacidad</p>
+                <p className="employee-detail__benefit-label">Hrs Incapacidad</p>
                 {editing ? (
                   <input
                     type="number"
@@ -388,9 +397,14 @@ export default function EmployeeDetail() {
                     className="employee-detail__input"
                   />
                 ) : (
-                  <p className="employee-detail__benefit-value employee-detail__benefit-value--green">
-                    {employee.sickLeaveHours} hrs
-                  </p>
+                  <>
+                    <p className="employee-detail__benefit-value employee-detail__benefit-value--green">
+                      {employee.sickLeaveHours}<span className="employee-detail__benefit-unit"> hrs</span>
+                    </p>
+                    <div className="employee-detail__bar">
+                      <div className="employee-detail__bar-fill employee-detail__bar-fill--green" style={{ width: `${sickPct}%` }} />
+                    </div>
+                  </>
                 )}
               </div>
             </div>

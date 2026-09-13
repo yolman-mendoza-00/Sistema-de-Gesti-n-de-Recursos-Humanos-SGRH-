@@ -102,3 +102,51 @@ export function finishDepartmentAssignment(employeeId, endDate) {
     body: JSON.stringify({ endDate }),
   });
 }
+
+// ========================================================================
+// AGREGAR ESTO AL FINAL DE TU api.js EXISTENTE (no reemplaza nada,
+// solo se suma a las funciones que ya tienes)
+// ========================================================================
+
+// --- Shifts ---
+export function getShifts() {
+  return request("/shifts");
+}
+export function updateShift(id, data) {
+  return request(`/shifts/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ startTime: data.startTime, endTime: data.endTime }),
+  });
+}
+export function getEmployeesByShift(shiftId) {
+  return request(`/shifts/${shiftId}/employees`);
+}
+export function createShift(data) {
+  return request("/shifts", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// --- Job Candidates ---
+export function getJobCandidates() {
+  return request("/job-candidates");
+}
+export function getJobCandidateById(id) {
+  return request(`/job-candidates/${id}`);
+}
+export function createJobCandidate(data) {
+  return request("/job-candidates", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+export function updateJobCandidate(id, data) {
+  return request(`/job-candidates/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+export function searchJobCandidatesByTitle(jobTitle) {
+  return request(`/job-candidates/jobTitle/${encodeURIComponent(jobTitle)}`);
+}
