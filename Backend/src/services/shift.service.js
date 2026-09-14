@@ -5,10 +5,11 @@ const getShifts = async () => {
 };
 
 const updateShift = async (id, data) => {
+
     const shifts = await shiftRepository.getAll();
 
     const shiftExists = shifts.some(
-        shift => shift.shiftId === Number(id)
+        shift => Number(shift.shiftId) === Number(id)
     );
 
     if (!shiftExists) {
@@ -19,10 +20,11 @@ const updateShift = async (id, data) => {
 };
 
 const getEmployeesByShift = async (shiftId) => {
+
     const shifts = await shiftRepository.getAll();
 
     const shiftExists = shifts.some(
-        shift => shift.shiftId === Number(shiftId)
+        shift => Number(shift.shiftId) === Number(shiftId)
     );
 
     if (!shiftExists) {
@@ -33,6 +35,7 @@ const getEmployeesByShift = async (shiftId) => {
 };
 
 const createShift = async (data) => {
+
     if (!data.name || !data.startTime || !data.endTime) {
         throw new Error(
             'Nombre, hora de inicio y hora de fin son obligatorios'
