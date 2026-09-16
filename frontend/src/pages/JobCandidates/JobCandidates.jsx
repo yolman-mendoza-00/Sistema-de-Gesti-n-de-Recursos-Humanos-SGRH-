@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import { getJobCandidates, searchJobCandidatesByTitle, createJobCandidate } from "../../api/api";
+import { getJobCandidates, getJobCandidateById, createJobCandidate } from "../../api/api";
 import "./JobCandidates.css";
 
 export default function JobCandidates() {
@@ -32,14 +32,21 @@ export default function JobCandidates() {
     setLoading(true);
     setError("");
     try {
-      if (!search.trim()) {
+      const term = search.trim();
+      if (!term) {
         await loadAll();
         return;
       }
-      const results = await searchJobCandidatesByTitle(search.trim());
-      setCandidates(results);
+      if (!/^\d+$/.test(term)) {
+        setError("Por ahora solo se puede buscar por ID (número).");
+        setCandidates([]);
+        return;
+      }
+      const result = await getJobCandidateById(term);
+      setCandidates(result ? [result] : []);
     } catch (err) {
       setError(err.message);
+      setCandidates([]);
     } finally {
       setLoading(false);
     }
@@ -59,12 +66,6 @@ export default function JobCandidates() {
     } finally {
       setSaving(false);
     }
-  }
-
-  function resumePreview(xml) {
-    if (!xml) return "";
-    const text = xml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    return text.length > 100 ? text.slice(0, 100) + "..." : text;
   }
 
   return (
@@ -101,7 +102,7 @@ export default function JobCandidates() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por puesto mencionado en el resume..."
+            placeholder="Buscar por ID de candidato..."
             className="job-candidates__search-input"
           />
           <button type="submit" className="job-candidates__search-btn">Buscar</button>
@@ -116,7 +117,6 @@ export default function JobCandidates() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Resume (vista previa)</th>
                   <th>Estado</th>
                   <th className="job-candidates__col-actions">Acciones</th>
                 </tr>
@@ -124,13 +124,12 @@ export default function JobCandidates() {
               <tbody>
                 {candidates.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="job-candidates__empty">No se encontraron candidatos.</td>
+                    <td colSpan={3} className="job-candidates__empty">No se encontraron candidatos.</td>
                   </tr>
                 )}
                 {candidates.map((c) => (
                   <tr key={c.jobCandidateId}>
                     <td>{c.jobCandidateId}</td>
-                    <td className="job-candidates__preview">{resumePreview(c.resume)}</td>
                     <td>
                       {c.businessEntityId ? (
                         <span className="job-candidates__badge job-candidates__badge--hired">Contratado</span>

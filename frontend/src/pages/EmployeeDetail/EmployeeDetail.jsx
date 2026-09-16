@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AppLayout from "../../components/AppLayout/AppLayout";
+
+import { FaUser } from "react-icons/fa";
+import { LuFileUser } from "react-icons/lu";
+import { IoMdTime } from "react-icons/io";
+
 import {
   getEmployeeById,
   updateEmployee,
@@ -222,7 +227,7 @@ export default function EmployeeDetail() {
         <div className="employee-detail__grid">
           <section className="employee-detail__section">
             <h3 className="employee-detail__section-title">
-              <span className="employee-detail__section-icon">👤</span> Datos Básicos
+              <span className="employee-detail__section-icon"><FaUser size={20}/></span> Datos Básicos
             </h3>
             <dl className="employee-detail__dl">
               <div className="employee-detail__row">
@@ -242,7 +247,7 @@ export default function EmployeeDetail() {
 
           <section className="employee-detail__section">
             <h3 className="employee-detail__section-title">
-              <span className="employee-detail__section-icon">📁</span> Información Laboral
+              <span className="employee-detail__section-icon"><LuFileUser size={24}/></span> Información Laboral
             </h3>
             <dl className="employee-detail__dl">
               <div className="employee-detail__row">
@@ -364,7 +369,7 @@ export default function EmployeeDetail() {
 
           <section className="employee-detail__section">
             <h3 className="employee-detail__section-title">
-              <span className="employee-detail__section-icon">⏱</span> Beneficios y Tiempo
+              <span className="employee-detail__section-icon"><IoMdTime size={24}/></span> Beneficios y Tiempo
             </h3>
             <div className="employee-detail__benefits">
               <div className="employee-detail__benefit-box">
